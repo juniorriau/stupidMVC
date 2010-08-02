@@ -24,8 +24,6 @@ class Cache {
 
 		if (self::$cache === null) {
 
-			//$config = basetek_config::get_instance();
-			
 			$host = Configuration::get('cache', 'host');
 			$port = Configuration::get('cache', 'port');
 
