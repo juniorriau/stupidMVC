@@ -1,0 +1,17 @@
+YE DESCRIPTION
+-
+STUPID MVC is a stupid simple model-view-controller framework library thing written for PHP, versions 5.3 and up. It uses the PDO extension for database access so you should probably have that installed too.
+
+It's really a very small, simple, little framework.
+
+
+YE INSTRUCTIONS
+-
+Download from here, unzip into some path that's part of your include path, make the magic.
+
+What? Need more documentation? Yeah. It's all on the Wiki, including configuration, app layout, etc, etc: http://wiki.github.com/wellsoliver/stupidMVC
+
+
+YE POINT OF CONTACT
+-
+Wells Oliver, wells@submute.net
