@@ -57,8 +57,8 @@ abstract class Model {
 	 *
 	 * @return bool|string False when there's no result, otherwise the value for the column in the first row
 	 **/
-	protected function fetch_column($query, $key) {
-		$results = $this->fetch_all($query);
+	protected function fetch_column($query, $params, $key) {
+		$results = $this->fetch_all($query, $params);
 		if (count($results) == 0) return false;
 
 		$row = array_shift($results);
@@ -71,8 +71,8 @@ abstract class Model {
 	 *
 	 * @return bool|string False when there's no result, otherwise an associative array of the result
 	 **/
-	protected function fetch_one($query) {
-		$results = $this->fetch_all($query);
+	protected function fetch_one($query, $params = array()) {
+		$results = $this->fetch_all($query, $params);
 		if (count($results) == 0) return false;
 		else return array_shift($results);
 	}
@@ -82,14 +82,16 @@ abstract class Model {
 	 *
 	 * @return bool|string False on failure, or all rows in the result as an associative array of associative arrays
 	 **/
-	protected function fetch_all($query) {
+	protected function fetch_all($query, $params = array()) {
+		if (is_array($params) === false) $params = array($params);
+
 		if (isset($this->handler) === false) {
 			$ok = $this->connect();
 			if ($ok === false) return false;
 		}
 		
 		$sth = $this->handler->prepare($query);
-		$sth->execute();
+		$sth->execute($params);
 
 		$ret = array();
 		while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
