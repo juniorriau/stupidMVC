@@ -49,11 +49,28 @@ class View {
 	 * @return void
 	 **/
 	public function render($action) {
+	    $wrappercontent = $templatecontent = "";
+
 		$template_file = sprintf("%s/%s.tpl.php", $this->template_location, $action);
+		$wrapper_file =  sprintf("%s/helpers/wrapper.tpl.php", STUPID_VIEW_PATH);
 		
 		if (file_exists($template_file)) {
+		    ob_start();
 			require_once $template_file;
+			$templatecontent = ob_get_contents();
+			ob_end_clean();
 		}
+		
+		if (file_exists($wrapper_file)) {
+		    ob_start();
+			require_once $wrapper_file;
+			$wrappercontent = ob_get_contents();
+			ob_end_clean();
+			
+			$wrappercontent = str_replace("%%CONTENT%%", $templatecontent, $wrappercontent);
+		}
+		
+		echo (empty($wrappercontent)) ? $templatecontent : $wrappercontent;
 	}
 	
 	/**
