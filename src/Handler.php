@@ -74,6 +74,7 @@ class Handler {
 			if (count($url_array) < 1) $action = 'index';
 			else $action = array_shift($url_array);
 			if (empty($action)) $action = 'index';
+			$action = str_replace("-", "_", $action);
 			if (empty($url_array) === false) $params = $url_array;
 			else $params = array();
 		}

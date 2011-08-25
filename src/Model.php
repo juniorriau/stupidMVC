@@ -50,7 +50,29 @@ abstract class Model {
 		
 		return true;
 	}
-	
+
+    /**
+     * Executes a query, usually an INSERT
+     *
+     * @return integer Number of rows affected
+     */
+    protected function query($query, $params = array()) {
+        if (is_array($params) === false) $params = array($params);
+
+		if (isset($this->handler) === false) {
+			$ok = $this->connect();
+			if ($ok === false) return false;
+		}
+
+     	$sth = $this->handler->prepare($query);
+		$sth->execute($params);
+
+
+		$errrorinfo = $sth->errorInfo();
+        if ($errrorinfo[1] != 0) throw new stupidException($errrorinfo[2]);
+
+	    return $sth->rowCount();   
+    }
 
 	/**
 	 * Takes a query and a field name as key and gives you a string value for the column in the first row, or false
@@ -93,12 +115,10 @@ abstract class Model {
 		$sth = $this->handler->prepare($query);
 		$sth->execute($params);
 
-		$ret = array();
-		while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
-			$ret[] = $row;
-		}
-		
-		return $ret;
+		$errrorinfo = $this->handler->errorInfo();
+        if ($errrorinfo[1] != 0) throw new stupidException($errrorinfo[2]);
+
+        return $sth->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
