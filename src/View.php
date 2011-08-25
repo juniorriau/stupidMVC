@@ -92,6 +92,11 @@ class View {
 		if (isset($this->data[$key])) return $this->data[$key];
 		else return false;
 	}
+
+    public function __get($name) {
+        return $this->get($name);
+    }
+
 }
 
 ?>
