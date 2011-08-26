@@ -32,6 +32,7 @@ class Handler {
 		define('STUPID_APPLICATION_PATH', $this->_application_path);
 		define('STUPID_WEB_ROOT', realpath($_SERVER['DOCUMENT_ROOT']));
 		define('STUPID_VIEW_PATH', $this->_application_path . '/views');
+		define('STUPID_PLUGIN_PATH', $this->_application_path . '/plugins');
 		
 		$ini = ini_get('include_path');
 		$ini .= PATH_SEPARATOR . STUPID_APPLICATION_PATH;
@@ -49,6 +50,7 @@ class Handler {
 	private function process() {
 		require_once 'Controller.php';
 		require_once 'View.php';
+		require_once 'Plugin.php';
 		require_once 'Model.php';
 
 		$c = Controller::factory("stupid_kernel");

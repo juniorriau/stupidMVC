@@ -18,6 +18,14 @@ class View {
 	 * @var string
 	 **/
 	private $template_location;
+	
+
+    /**
+     * Fully-qualified location of the plugin direction
+     *
+     * @var string
+     */
+	private $plugin_location;
 
 	/**
 	 * All key/value pairs passed from the controller
@@ -25,6 +33,15 @@ class View {
 	 * @var string
 	 **/
 	private $data;
+	
+
+    /**
+     * All instantiated plugins associated with this view
+     *
+     * @var string
+     */
+	private $plugins;
+
 	
 	private function __construct() {
 	}
@@ -37,8 +54,20 @@ class View {
 	public static function factory($name) {
 		$view = new View();
 		$view->name = $name;
+		$view->plugins = array();
 		$view->template_location = sprintf("%s/%s", STUPID_VIEW_PATH, $name);
+		$view->plugin_location = STUPID_PLUGIN_PATH;
 		
+		foreach (glob($view->plugin_location . "/*.php") as $file) {
+		    require_once $file;
+		    $info = pathinfo($file);
+		    $class = $info["filename"];
+		    
+		    if (class_exists($class)) {
+		        $view->plugins[$class] = new $class;
+		    }
+		}
+
 		return $view;
 	}
 	
@@ -93,8 +122,25 @@ class View {
 		else return false;
 	}
 
+
+    /**
+     * Overrides the __get magic method to return a value for a key
+     *
+     * @param string $name 
+	 * @return bool|string False when the key doesn't exist, otherwise string value
+     */
     public function __get($name) {
         return $this->get($name);
+    }
+
+
+    public function __call($function, $args) {
+        $plugin_class = sprintf("stupid_plugin_%s", $function);
+        $plugin_object = $this->plugins[$plugin_class];
+        
+        if (method_exists($plugin_object, $function) === false) throw new stupidException(sprintf("no such plugin %s", $function));
+        
+        return call_user_func_array(array($plugin_object, $function), $args);
     }
 
 }
