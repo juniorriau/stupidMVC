@@ -25,9 +25,12 @@ abstract class Controller {
 	 * @var object
 	 **/
 	protected $model;
+
+    protected $usewrapper;
 	
 	private function __construct($name) {
 		$this->name = $name;
+		$this->usewrapper = true;
 	}
 	
 	/**
@@ -80,6 +83,15 @@ abstract class Controller {
 		$this->model = $model;
 		return true;
 	}
+
+    public function showWrapper() {
+        return $this->usewrapper;
+    }
+
+
+    public function noWrapper() {
+        $this->usewrapper = false;
+    }
 	
 }
 

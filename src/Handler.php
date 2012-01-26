@@ -99,7 +99,7 @@ class Handler {
 		
 		$view = View::factory($name);
 		$view->setData($data);
-		$view->render($action);
+		$view->render($action, $controller->showWrapper());
 	}
 }
 

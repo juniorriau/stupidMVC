@@ -41,7 +41,6 @@ class View {
      * @var string
      */
 	private $plugins;
-
 	
 	private function __construct() {
 	}
@@ -77,7 +76,7 @@ class View {
 	 *
 	 * @return void
 	 **/
-	public function render($action) {
+	public function render($action, $usewrapper = true) {
 	    $wrappercontent = $templatecontent = "";
 
 		$template_file = sprintf("%s/%s.tpl.php", $this->template_location, $action);
@@ -90,7 +89,7 @@ class View {
 			ob_end_clean();
 		}
 		
-		if (file_exists($wrapper_file)) {
+		if (file_exists($wrapper_file) && $usewrapper) {
 		    ob_start();
 			require_once $wrapper_file;
 			$wrappercontent = ob_get_contents();

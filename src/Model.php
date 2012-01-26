@@ -37,9 +37,11 @@ abstract class Model {
 		$password = Configuration::get('database', 'password');
 		$database = Configuration::get('database', 'database');
 		$driver = Configuration::get('database', 'driver');
+		$port = Configuration::get('database', 'port');
 		if ($driver === false) $driver = 'mysql';
+		if ($port === false) $driver = '3306';
 		
-		$string = sprintf("%s:host=%s;dbname=%s", $driver, $host, $database);
+		$string = sprintf("%s:host=%s;dbname=%s;port=%s", $driver, $host, $database, $port);
 		try {
 			$this->handler = new PDO($string, $user, $password);
 		} catch (PDOException $e) {
@@ -119,6 +121,34 @@ abstract class Model {
         if ($errrorinfo[1] != 0) throw new stupidException($errrorinfo[2]);
 
         return $sth->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+
+	protected function begin() {
+		if (isset($this->handler) === false) {
+			$ok = $this->connect();
+			if ($ok === false) return false;
+		}
+
+		return $this->handler->beginTransaction();
+	}
+
+	protected function commit() {
+		if (isset($this->handler) === false) {
+			$ok = $this->connect();
+			if ($ok === false) return false;
+		}
+
+		return $this->handler->commit();
+	}
+
+	protected function rollback() {
+		if (isset($this->handler) === false) {
+			$ok = $this->connect();
+			if ($ok === false) return false;
+		}
+
+		return $this->handler->rollback();
 	}
 
 	/**
