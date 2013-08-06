@@ -52,6 +52,22 @@ abstract class Model {
 		
 		return true;
 	}
+    
+
+    /**
+     * Returns an escaped, quoted value
+     *
+     * @param string $value 
+     * @return string The quoted value
+     */
+    protected function quote($value) {
+		if (isset($this->handler) === false) {
+			$ok = $this->connect();
+			if ($ok === false) return false;
+		}
+        
+        return $this->handler->quote($value);
+    }
 
     /**
      * Executes a query, usually an INSERT
