@@ -7,41 +7,41 @@ require_once 'Configuration.php';
  **/
 abstract class Model {
 
-	/**
-	 * Name of the controller, e.g. 'index'
-	 *
-	 * @var string
-	 **/
-	protected $name;
+    /**
+     * Name of the controller, e.g. 'index'
+     *
+     * @var string
+     **/
+    protected $name;
 
-	/**
-	 * The PDO connection object
-	 *
-	 * @var object
-	 **/
-	private $handler;
-	
-	private function __construct($name) {
-		$this->name = $name;
-	}
-	
+    /**
+     * The PDO connection object
+     *
+     * @var object
+     **/
+    private $handler;
+    
+    private function __construct($name) {
+        $this->name = $name;
+    }
+    
 
-	/**
-	 * Tries to connect to the database
-	 *
-	 * @return bool Whether we could connect; dies on failure
-	 **/
-	private function connect() {
-		$host = Configuration::get('database', 'host');
-		$user = Configuration::get('database', 'user');
-		$password = Configuration::get('database', 'password');
-		$database = Configuration::get('database', 'database');
-		$driver = Configuration::get('database', 'driver');
-		$port = Configuration::get('database', 'port');
-		if ($driver === false) $driver = 'mysql';
-		if ($port === false) $driver = '3306';
-		
-		$string = sprintf("%s:host=%s;dbname=%s;port=%s", $driver, $host, $database, $port);
+    /**
+     * Tries to connect to the database
+     *
+     * @return bool Whether we could connect; dies on failure
+     **/
+    private function connect() {
+        $host = Configuration::get('database', 'host');
+        $user = Configuration::get('database', 'user');
+        $password = Configuration::get('database', 'password');
+        $database = Configuration::get('database', 'database');
+        $driver = Configuration::get('database', 'driver');
+        $port = Configuration::get('database', 'port');
+        if ($driver === false) $driver = 'mysql';
+        if ($port === false) $driver = '3306';
+        
+        $string = sprintf("%s:host=%s;dbname=%s;port=%s", $driver, $host, $database, $port);
 
 
         $string = sprintf("%s:host=%s;dbname=%s;port=%s", $driver, $host, $database, $port);
@@ -53,14 +53,14 @@ abstract class Model {
             } else {
                 $this->handler = new PDO($string);
             }
-		} catch (PDOException $e) {
-			error_log("PDO connection error: " . $e->getMessage());
-			throw new stupidException($e->getMessage(), $e->getCode(), $e);
-			die;
-		}
-		
-		return true;
-	}
+        } catch (PDOException $e) {
+            error_log("PDO connection error: " . $e->getMessage());
+            throw new stupidException($e->getMessage(), $e->getCode(), $e);
+            die;
+        }
+        
+        return true;
+    }
     
 
     /**
@@ -70,10 +70,10 @@ abstract class Model {
      * @return string The quoted value
      */
     protected function quote($value) {
-		if (isset($this->handler) === false) {
-			$ok = $this->connect();
-			if ($ok === false) return false;
-		}
+        if (isset($this->handler) === false) {
+            $ok = $this->connect();
+            if ($ok === false) return false;
+        }
         
         return $this->handler->quote($value);
     }
@@ -86,106 +86,106 @@ abstract class Model {
     protected function query($query, $params = array()) {
         if (is_array($params) === false) $params = array($params);
 
-		if (isset($this->handler) === false) {
-			$ok = $this->connect();
-			if ($ok === false) return false;
-		}
+        if (isset($this->handler) === false) {
+            $ok = $this->connect();
+            if ($ok === false) return false;
+        }
 
-     	$sth = $this->handler->prepare($query);
-		$sth->execute($params);
+        $sth = $this->handler->prepare($query);
+        $sth->execute($params);
 
 
-		$errrorinfo = $sth->errorInfo();
+        $errrorinfo = $sth->errorInfo();
         if ($errrorinfo[1] != 0) throw new stupidException($errrorinfo[2]);
 
-	    return $sth->rowCount();   
+        return $sth->rowCount();   
     }
 
-	/**
-	 * Takes a query and a field name as key and gives you a string value for the column in the first row, or false
-	 *
-	 * @return bool|string False when there's no result, otherwise the value for the column in the first row
-	 **/
-	protected function fetch_column($query, $params, $key) {
-		$results = $this->fetch_all($query, $params);
-		if (count($results) == 0) return false;
+    /**
+     * Takes a query and a field name as key and gives you a string value for the column in the first row, or false
+     *
+     * @return bool|string False when there's no result, otherwise the value for the column in the first row
+     **/
+    protected function fetch_column($query, $params, $key) {
+        $results = $this->fetch_all($query, $params);
+        if (count($results) == 0) return false;
 
-		$row = array_shift($results);
-		if (isset($row[$key]) === false) return false;
-		else return $row[$key];
-	}
-	
-	/**
-	 * Gives you the first row of a database query
-	 *
-	 * @return bool|string False when there's no result, otherwise an associative array of the result
-	 **/
-	protected function fetch_one($query, $params = array()) {
-		$results = $this->fetch_all($query, $params);
-		if (count($results) == 0) return false;
-		else return array_shift($results);
-	}
-	
-	/**
-	 * Gives you the all rows from the query
-	 *
-	 * @return bool|string False on failure, or all rows in the result as an associative array of associative arrays
-	 **/
-	protected function fetch_all($query, $params = array()) {
-		if (is_array($params) === false) $params = array($params);
+        $row = array_shift($results);
+        if (isset($row[$key]) === false) return false;
+        else return $row[$key];
+    }
+    
+    /**
+     * Gives you the first row of a database query
+     *
+     * @return bool|string False when there's no result, otherwise an associative array of the result
+     **/
+    protected function fetch_one($query, $params = array()) {
+        $results = $this->fetch_all($query, $params);
+        if (count($results) == 0) return false;
+        else return array_shift($results);
+    }
+    
+    /**
+     * Gives you the all rows from the query
+     *
+     * @return bool|string False on failure, or all rows in the result as an associative array of associative arrays
+     **/
+    protected function fetch_all($query, $params = array()) {
+        if (is_array($params) === false) $params = array($params);
 
-		if (isset($this->handler) === false) {
-			$ok = $this->connect();
-			if ($ok === false) return false;
-		}
-		
-		$sth = $this->handler->prepare($query);
-		$sth->execute($params);
+        if (isset($this->handler) === false) {
+            $ok = $this->connect();
+            if ($ok === false) return false;
+        }
+        
+        $sth = $this->handler->prepare($query);
+        $sth->execute($params);
 
-		$errrorinfo = $this->handler->errorInfo();
+        $errrorinfo = $this->handler->errorInfo();
         if ($errrorinfo[1] != 0) throw new stupidException($errrorinfo[2]);
 
         return $sth->fetchAll(PDO::FETCH_ASSOC);
-	}
+    }
 
 
-	protected function begin() {
-		if (isset($this->handler) === false) {
-			$ok = $this->connect();
-			if ($ok === false) return false;
-		}
+    protected function begin() {
+        if (isset($this->handler) === false) {
+            $ok = $this->connect();
+            if ($ok === false) return false;
+        }
 
-		return $this->handler->beginTransaction();
-	}
+        return $this->handler->beginTransaction();
+    }
 
-	protected function commit() {
-		if (isset($this->handler) === false) {
-			$ok = $this->connect();
-			if ($ok === false) return false;
-		}
+    protected function commit() {
+        if (isset($this->handler) === false) {
+            $ok = $this->connect();
+            if ($ok === false) return false;
+        }
 
-		return $this->handler->commit();
-	}
+        return $this->handler->commit();
+    }
 
-	protected function rollback() {
-		if (isset($this->handler) === false) {
-			$ok = $this->connect();
-			if ($ok === false) return false;
-		}
+    protected function rollback() {
+        if (isset($this->handler) === false) {
+            $ok = $this->connect();
+            if ($ok === false) return false;
+        }
 
-		return $this->handler->rollback();
-	}
+        return $this->handler->rollback();
+    }
 
-	/**
-	 * Factory method to return a new model or false on failure
-	 *
-	 * @return bool|object False on failure, model object on success
-	 **/
-	public static function factory($name) {
-		$full = sprintf("%s_model", $name);
-		if (class_exists($full) === false) return false;
-		else return new $full($name);
-	}
+    /**
+     * Factory method to return a new model or false on failure
+     *
+     * @return bool|object False on failure, model object on success
+     **/
+    public static function factory($name) {
+        $full = sprintf("%s_model", $name);
+        if (class_exists($full) === false) return false;
+        else return new $full($name);
+    }
 }
 
 ?>
