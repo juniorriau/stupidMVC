@@ -28,7 +28,7 @@ class Handler {
 	private $_application_path;
 	
 	public function __construct() {
-		$this->_application_path = realpath($_SERVER['DOCUMENT_ROOT'] . '/../app');
+        $this->_application_path = realpath(dirname($_SERVER["SCRIPT_FILENAME"]) . '/../app');
 		define('STUPID_APPLICATION_PATH', $this->_application_path);
 		define('STUPID_WEB_ROOT', realpath($_SERVER['DOCUMENT_ROOT']));
 		define('STUPID_VIEW_PATH', $this->_application_path . '/views');
@@ -66,7 +66,13 @@ class Handler {
 		
 		$url = $_GET['url'];
 
-		if (empty($url)) {
+        $root = Configuration::get('application', 'location');
+
+        if ($root) {
+            $url = str_replace($root, "", $url);
+        }
+
+		if ($url == "/" || empty($url)) {
 			$name = 'index';
 			$action = 'index';
 			$params = array();
@@ -82,7 +88,7 @@ class Handler {
 		}
 
 		$controller = Controller::factory($name);
-		
+
 		if ($controller === false) {
 			throw new stupidException(sprintf("No such controller: %s", $name));
 		}
@@ -97,6 +103,11 @@ class Handler {
 		call_user_func_array(array($controller, $action), $params);
 		$data = $controller->getData();
 		
+		if ($c !== false) {
+			$c->setModel(Model::factory("stupid_kernel"));
+			if (method_exists($c, "post_process")) $c->post_process($data);
+		}
+        
 		$view = View::factory($name);
 		$view->setData($data);
 		$view->render($action, $controller->showWrapper());

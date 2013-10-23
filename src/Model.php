@@ -42,8 +42,17 @@ abstract class Model {
 		if ($port === false) $driver = '3306';
 		
 		$string = sprintf("%s:host=%s;dbname=%s;port=%s", $driver, $host, $database, $port);
-		try {
-			$this->handler = new PDO($string, $user, $password);
+
+
+        $string = sprintf("%s:host=%s;dbname=%s;port=%s", $driver, $host, $database, $port);
+        try {
+            if ($user && $password) {
+                $this->handler = new PDO($string, $user, $password);
+            } else if ($user) {
+                $this->handler = new PDO($string, $user);
+            } else {
+                $this->handler = new PDO($string);
+            }
 		} catch (PDOException $e) {
 			error_log("PDO connection error: " . $e->getMessage());
 			throw new stupidException($e->getMessage(), $e->getCode(), $e);

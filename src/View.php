@@ -121,6 +121,10 @@ class View {
 		else return false;
 	}
 
+    public function stylesheet_link_tag($url, $media = "screen") {
+        echo sprintf("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />\n", $url);
+    }
+
 
     /**
      * Overrides the __get magic method to return a value for a key
